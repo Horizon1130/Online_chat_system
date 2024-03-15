@@ -1,0 +1,23 @@
+version: '3.0'
+services:
+  mysql:  #mysql 服务
+    image: mysql:latest  #使用MySQL镜像，标签为 latest，即最新版本。
+    container_name: mysql #容器名称为 mysql
+    environment:
+      MYSQL_DATABASE: chatroom  #数据库名称 chatroom
+      MYSQL_ROOT_PASSWORD: 123456  #数据库密码
+    ports:
+      - "3307:3306"  #将容器的 MySQL 3306 端口映射到主机的 3307 端口
+    healthcheck:
+      #健康检查，检查 MySQL 服务器是否运行。
+      test: [ "CMD-SHELL", "mysqladmin ping -h localhost -u root -p123456" ]
+      interval: 5s
+      retries: 10
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile #使用当前目录下的 Dockerfile 构建镜像
+    depends_on:
+      - mysql #依赖于 mysql 服务，即在启动 app 服务之前，确保 mysql 服务已经启动
+    ports:
+      - 8080:8080  #将容器的 8080 端口映射到主机的 8080 端口
